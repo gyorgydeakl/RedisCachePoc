@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using RedisCachePocApi.Dal;
 using Scalar.AspNetCore;
 using StackExchange.Redis;
 
-namespace RedisCachePocApi;
+namespace RedisCachePocApi.MovieReviewer;
 
 public class Program
 {
@@ -17,8 +18,18 @@ public class Program
             .Connect(builder.Configuration.GetConnectionString("RedisCache")!);
         builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
         builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+            options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAngularDev",
+                policy =>
+                {
+                    policy.WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+        });
+        
         var app = builder.Build();
 
         // --- Pipeline ------------------------------------------------------
@@ -49,7 +60,25 @@ public class Program
                     : Results.NotFound($"Key '{key}' not found.");
             })
             .WithOpenApi();
+        
+        app.MapGet("/movies", async (AppDbContext db) =>
+        {
+            var result = await db.Movies.Select(m => m.ToSummaryDto()).ToListAsync();
+            return Results.Ok(result);
+        });
 
+        app.MapGet("/movies/{id}", async (Guid id, AppDbContext db) =>
+        {
+            var result = await db.Movies.Where(m => m.Id == id).Select(m => m.ToDetailsDto()).SingleOrDefaultAsync();
+            return Results.Ok(result);
+        });
+
+        app.MapGet("/user/{id}", async (Guid id, AppDbContext db) =>
+        {
+            var result = await db.Users.Where(u => u.Id == id).Select(u => u.ToDto()).SingleOrDefaultAsync();
+            return Results.Ok(result);
+        });
+        
         app.Run();
     }
 }

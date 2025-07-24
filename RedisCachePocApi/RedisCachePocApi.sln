@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisCachePocApi", "RedisCachePocApi\RedisCachePocApi.csproj", "{9BE9C382-5CE5-490C-B48E-F13857DEC00F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieReviewer", "MovieReviewer\MovieReviewer.csproj", "{9BE9C382-5CE5-490C-B48E-F13857DEC00F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dal", "Dal\Dal.csproj", "{DA8D63B9-4B87-4246-AFD0-139A7AD1D08A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +14,9 @@ Global
 		{9BE9C382-5CE5-490C-B48E-F13857DEC00F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9BE9C382-5CE5-490C-B48E-F13857DEC00F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9BE9C382-5CE5-490C-B48E-F13857DEC00F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA8D63B9-4B87-4246-AFD0-139A7AD1D08A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA8D63B9-4B87-4246-AFD0-139A7AD1D08A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA8D63B9-4B87-4246-AFD0-139A7AD1D08A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA8D63B9-4B87-4246-AFD0-139A7AD1D08A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
