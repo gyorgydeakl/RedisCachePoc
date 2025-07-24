@@ -16,4 +16,5 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     }
     public DbSet<User> Users => Set<User>();
     public DbSet<Movie> Movies => Set<Movie>();
+    public DbSet<Review> Reviews => Set<Review>();
 }

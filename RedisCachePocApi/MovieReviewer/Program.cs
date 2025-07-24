@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RedisCachePocApi.Dal;
 using Scalar.AspNetCore;
@@ -40,8 +41,8 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+        app.UseCors("AllowAngularDev");
         app.UseAuthorization();
-
         // --- Minimal‑API endpoints -----------------------------------------
         app.MapPost("/cache",
             async (CacheItem item, IConnectionMultiplexer mux) =>
@@ -64,20 +65,39 @@ public class Program
         app.MapGet("/movies", async (AppDbContext db) =>
         {
             var result = await db.Movies.Select(m => m.ToSummaryDto()).ToListAsync();
-            return Results.Ok(result);
-        });
+            return TypedResults.Ok(result);
+        })
+        .WithOpenApi();
+
+        app.MapPost("/movies", async ([FromBody] CreateMovieDto dto, AppDbContext db) =>
+        {
+            var newMovie = db.Movies.Add(dto.ToMovie()).Entity;
+            await db.SaveChangesAsync();
+            return TypedResults.Ok(newMovie.ToDetailsDto());
+        })
+        .WithOpenApi();
 
         app.MapGet("/movies/{id:guid}", async (Guid id, AppDbContext db) =>
         {
             var result = await db.Movies.Where(m => m.Id == id).Select(m => m.ToDetailsDto()).SingleOrDefaultAsync();
-            return Results.Ok(result);
-        });
+            return TypedResults.Ok(result);
+        })
+        .WithOpenApi();
+
+        app.MapPost("/movies/{id:guid}/reviews", async (Guid id, [FromBody] CreateReviewDto dto, AppDbContext db) =>
+        {
+            var newReview = db.Reviews.Add(dto.ToReview()).Entity;
+            await db.SaveChangesAsync();
+            return TypedResults.Ok(newReview.ToDto());
+        })
+        .WithOpenApi();
 
         app.MapGet("/user/{id:guid}", async (Guid id, AppDbContext db) =>
         {
             var result = await db.Users.Where(u => u.Id == id).Select(u => u.ToDto()).SingleOrDefaultAsync();
-            return Results.Ok(result);
-        });
+            return TypedResults.Ok(result);
+        })
+        .WithOpenApi();
         
         app.Run();
     }
