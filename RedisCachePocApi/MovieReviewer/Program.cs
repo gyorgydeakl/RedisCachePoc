@@ -67,13 +67,13 @@ public class Program
             return Results.Ok(result);
         });
 
-        app.MapGet("/movies/{id}", async (Guid id, AppDbContext db) =>
+        app.MapGet("/movies/{id:guid}", async (Guid id, AppDbContext db) =>
         {
             var result = await db.Movies.Where(m => m.Id == id).Select(m => m.ToDetailsDto()).SingleOrDefaultAsync();
             return Results.Ok(result);
         });
 
-        app.MapGet("/user/{id}", async (Guid id, AppDbContext db) =>
+        app.MapGet("/user/{id:guid}", async (Guid id, AppDbContext db) =>
         {
             var result = await db.Users.Where(u => u.Id == id).Select(u => u.ToDto()).SingleOrDefaultAsync();
             return Results.Ok(result);
