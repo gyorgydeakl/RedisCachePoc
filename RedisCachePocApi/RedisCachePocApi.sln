@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieReviewer", "MovieRevie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dal", "Dal\Dal.csproj", "{DA8D63B9-4B87-4246-AFD0-139A7AD1D08A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoviePlanner", "MoviePlanner\MoviePlanner.csproj", "{3DDAD8D8-D0A5-4837-AFC9-B0BBD953854F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{DA8D63B9-4B87-4246-AFD0-139A7AD1D08A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA8D63B9-4B87-4246-AFD0-139A7AD1D08A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA8D63B9-4B87-4246-AFD0-139A7AD1D08A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DDAD8D8-D0A5-4837-AFC9-B0BBD953854F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DDAD8D8-D0A5-4837-AFC9-B0BBD953854F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DDAD8D8-D0A5-4837-AFC9-B0BBD953854F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DDAD8D8-D0A5-4837-AFC9-B0BBD953854F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,11 @@
+﻿generatorName: typescript-angular
+inputSpec: http://localhost:5273/openapi/v1.json
+outputDir: src/planner-client
+additionalProperties:
+  ngVersion: 20
+  providedInRoot: true
+  stringEnums: true
+  typescriptThreePlus: true
+  supportsES6: true
+  serviceSuffix: Client
+  serviceFileSuffix: .client

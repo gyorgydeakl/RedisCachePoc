@@ -1,9 +1,9 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import {MovieListComponent} from './movie-list/movie-list.component';
+import {MovieListComponent} from './reviewer/movie-list/movie-list.component';
 import {Toast} from 'primeng/toast';
-import {AddMovieComponent} from './add-movie/add-movie.component';
-import {NavbarComponent} from './navbar/navbar.component';
+import {AddMovieComponent} from './reviewer/add-movie/add-movie.component';
+import {NavbarComponent} from './reviewer/navbar/navbar.component';
 
 @Component({
   selector: 'app-root',

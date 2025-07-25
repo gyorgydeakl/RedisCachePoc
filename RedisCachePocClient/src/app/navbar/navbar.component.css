@@ -1,5 +1,0 @@
-@layer components {
-  nav {
-    @apply rounded-b-xl lg:rounded-none;
-  }
-}

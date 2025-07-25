@@ -1,0 +1,56 @@
+<section class="p-4 lg:p-8">
+  <!-- Toolbar -->
+  <header
+    class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+  >
+    <h2 class="text-3xl font-semibold tracking-tight">🎞️ Watch List</h2>
+
+    <button pButton type="button" class="p-button-sm" (click)="loadWatchlist()">
+      <i class="pi pi-refresh" pButtonIcon></i>
+      <span pButtonLabel>Refresh</span>
+    </button>
+  </header>
+
+  <!-- PrimeNG table -->
+  <p-table
+    [value]="items()"
+    [paginator]="true"
+    [rows]="10"
+    class="shadow rounded-lg"
+  >
+    <!-- Header -->
+    <ng-template #header>
+      <tr>
+        <th>Title</th>
+        <th class="w-1">Actions</th>
+      </tr>
+    </ng-template>
+
+    <!-- Body rows -->
+    <ng-template #body let-item>
+      <tr>
+        <td>{{ item.title }}</td>
+        <td>
+          <button
+            pButton
+            type="button"
+            class="p-button-text p-button-sm"
+            (click)="goTo(item.movieId)"
+          >
+            <i class="pi pi-eye" pButtonIcon></i>
+            <span pButtonLabel>View</span>
+          </button>
+        </td>
+      </tr>
+    </ng-template>
+
+    <!-- Empty -->
+    <ng-template #empty>
+      <tr>
+        <td colspan="2" class="text-center py-6 italic text-gray-500">
+          No entries in watch list.
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</section>
