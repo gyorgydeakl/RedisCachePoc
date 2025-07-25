@@ -2,7 +2,7 @@
   class="bg-primary-600 text-white px-4 py-3 flex items-center justify-between shadow-md"
 >
   <!-- Logo / title -->
-  <a routerLink="/" class="text-xl font-semibold tracking-wide">
+  <a routerLink="/" class="text-xl text-green-900 font-semibold tracking-wide">
     🎥 Movie App
   </a>
 
@@ -12,6 +12,16 @@
     <button pButton (click)="clearCache()" class="p-button-sm p-button-text">
       <i class="pi pi-refresh" pButtonIcon></i>
       <span pButtonLabel>Clear Cache</span>
+    </button>
+    <!-- add random data -->
+    <button pButton (click)="addRandomData()" class="p-button-sm p-button-text">
+      <i class="pi pi-plus" pButtonIcon></i>
+      <span pButtonLabel>Add Random Data</span>
+    </button>
+    <!-- clear the db -->
+    <button pButton (click)="clearDb()" class="p-button-sm p-button-text">
+      <i class="pi pi-trash" pButtonIcon></i>
+      <span pButtonLabel>Clear DB</span>
     </button>
     <!-- All movies -->
     <button pButton routerLink="/movies" class="p-button-sm p-button-text">

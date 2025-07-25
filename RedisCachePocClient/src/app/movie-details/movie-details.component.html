@@ -42,6 +42,31 @@
       <ng-template pTemplate="header">
         <h2 class="text-2xl font-medium flex items-center gap-2 pl-5 pt-5">
           <i class="pi pi-comments text-primary-500"></i> Reviews
+
+          <!-- spacer pushes buttons to the right -->
+          <span class="flex-grow"></span>
+
+          <!-- 🔘 Generate‑reviews -->
+          <button
+            pButton
+            type="button"
+            class="p-button-sm"
+            (click)="generateReviews()"
+          >
+            <i class="pi pi-plus" pButtonIcon></i>
+            <span pButtonLabel>Generate</span>
+          </button>
+
+          <!-- 🔄 Reload -->
+          <button
+            pButton
+            type="button"
+            class="p-button-sm ml-2"
+            (click)="reload()"
+          >
+            <i class="pi pi-refresh" pButtonIcon></i>
+            <span pButtonLabel>Reload</span>
+          </button>
         </h2>
       </ng-template>
 

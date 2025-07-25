@@ -62,6 +62,12 @@ public record CreateUserDto
     public required string Email { get; set; }
 }
 
+public record SeedDto
+{
+    public required int MovieCount { get; init; }
+    public required int ReviewCount { get; init; }
+    public required int UserCount { get; init; }
+}
 public static class DtoExtensions
 {
     public static Movie ToMovie(this CreateMovieDto dto)

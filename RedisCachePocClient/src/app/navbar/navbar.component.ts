@@ -27,4 +27,26 @@ export class NavbarComponent {
       })
     )
   }
+
+  addRandomData() {
+    this.client.addRandomData({
+      movieCount: 100,
+      reviewCount: 1000,
+      userCount: 1000,
+    }).subscribe(r => this.messageService.add({
+      severity: 'success',
+      summary: 'Data added',
+      detail: `Added ${r.moviesInserted} movies, ${r.usersInserted} users and ${r.reviewsInserted} reviews!`
+    }))
+  }
+
+  clearDb() {
+    this.client.clearDatabase().subscribe(
+      _ => this.messageService.add({
+        severity: 'success',
+        summary: 'Database cleared',
+        detail: 'Database cleared!'
+      })
+    )
+  }
 }
