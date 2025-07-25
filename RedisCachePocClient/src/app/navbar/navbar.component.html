@@ -1,0 +1,32 @@
+<nav
+  class="bg-primary-600 text-white px-4 py-3 flex items-center justify-between shadow-md"
+>
+  <!-- Logo / title -->
+  <a routerLink="/" class="text-xl font-semibold tracking-wide">
+    🎥 Movie App
+  </a>
+
+  <!-- Action buttons -->
+  <div class="flex gap-3">
+    <!-- clear cache -->
+    <button pButton (click)="clearCache()" class="p-button-sm p-button-text">
+      <i class="pi pi-refresh" pButtonIcon></i>
+      <span pButtonLabel>Clear Cache</span>
+    </button>
+    <!-- All movies -->
+    <button pButton routerLink="/movies" class="p-button-sm p-button-text">
+      <i class="pi pi-list" pButtonIcon></i>
+      <span pButtonLabel>Movies</span>
+    </button>
+
+    <!-- New user -->
+    <button
+      pButton
+      routerLink="/users/new"
+      class="p-button-sm p-button-outlined"
+    >
+      <i class="pi pi-user-plus" pButtonIcon></i>
+      <span pButtonLabel>Add User</span>
+    </button>
+  </div>
+</nav>

@@ -1,0 +1,57 @@
+<section class="p-4 w-full max-w-lg mx-auto space-y-6">
+  <!-- Heading -->
+  <h2 class="text-2xl font-semibold flex items-center gap-2">
+    <i class="pi pi-user-plus"></i> Create New User
+  </h2>
+
+  <!-- Username -->
+  <div>
+    <label for="username" class="block mb-1 font-medium">Username</label>
+    <input
+      id="username"
+      pInputText
+      [(ngModel)]="command.username"
+      placeholder="e.g. johndoe"
+      class="w-full"
+    />
+  </div>
+
+  <!-- Email -->
+  <div>
+    <label for="email" class="block mb-1 font-medium">Email</label>
+    <input
+      id="email"
+      type="email"
+      pInputText
+      [(ngModel)]="command.email"
+      placeholder="johndoe@example.com"
+      class="w-full"
+    />
+  </div>
+
+  <!-- Bio -->
+  <div>
+    <label for="bio" class="block mb-1 font-medium">Bio</label>
+    <textarea
+      id="bio"
+      pTextarea
+      rows="4"
+      [(ngModel)]="command.bio"
+      placeholder="Tell us a bit about yourself…"
+      class="w-full"
+    ></textarea>
+  </div>
+
+  <!-- Submit button -->
+  <div class="pt-2">
+    <button
+      pButton
+      type="button"
+      class="w-full p-button-success"
+      (click)="createUser()"
+    >
+      <i class="pi pi-check" pButtonIcon></i>
+      <span pButtonLabel>Create User</span>
+    </button>
+  </div>
+</section>

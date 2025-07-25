@@ -44,9 +44,7 @@ public record CreateReviewDto
     public required int Rating { get; set; }
     public required string Title { get; set; }
     public required string Description { get; set; }
-    public required Guid MovieId { get; set; }
     public required Guid UserId { get; set; }
-    public required DateTime Date { get; set; } = DateTime.UtcNow;
 }
 
 public record UserDto
@@ -54,6 +52,14 @@ public record UserDto
     public required Guid Id { get; set; }
     public required string Username { get; set; }
     public required string Bio { get; set; }
+    public required string Email { get; set; }
+}
+
+public record CreateUserDto
+{
+    public required string Username { get; set; }
+    public required string Bio { get; set; }
+    public required string Email { get; set; }
 }
 
 public static class DtoExtensions
@@ -69,16 +75,16 @@ public static class DtoExtensions
         };
     }
 
-    public static Review ToReview(this CreateReviewDto dto)
+    public static Review ToReview(this CreateReviewDto dto, Guid movieId, DateTime date)
     {
         return new Review()
         {
             Rating = dto.Rating,
             Title = dto.Title,
             Description = dto.Description,
-            MovieId = dto.MovieId,
+            MovieId = movieId,
             UserId = dto.UserId,
-            Date = dto.Date
+            Date = date
         };
     }
     public static MovieSummaryDto ToSummaryDto(this Movie movie)
@@ -124,7 +130,17 @@ public static class DtoExtensions
         {
             Id = user.Id,
             Username = user.Username,
-            Bio = user.Bio
+            Bio = user.Bio,
+            Email = user.Email
+        };
+    }
+    public static User ToUser(this CreateUserDto dto)
+    {
+        return new User()
+        {
+            Username = dto.Username,
+            Bio = dto.Bio,
+            Email = dto.Email
         };
     }
 }

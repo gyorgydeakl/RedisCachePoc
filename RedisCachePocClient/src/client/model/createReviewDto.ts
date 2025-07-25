@@ -13,8 +13,6 @@ export interface CreateReviewDto {
     rating: number;
     title: string;
     description: string;
-    movieId: string;
     userId: string;
-    date: string;
 }
 

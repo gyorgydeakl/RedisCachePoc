@@ -1,0 +1,82 @@
+<section class="p-4 w-full max-w-lg mx-auto space-y-6">
+  <h2 class="text-2xl font-semibold flex items-center gap-2">
+    <i class="pi pi-pencil"></i> Add Your Review
+  </h2>
+
+  <!-- ░░░  USER PICKER  ░░░ -->
+  <div>
+    <label class="block mb-1 font-medium">User</label>
+    <p-select
+      [options]="users()"
+      [optionLabel]="selectLabel"
+      optionValue="id"
+      placeholder="Select user…"
+      class="w-full"
+      [(ngModel)]="command.userId"
+      >
+      <ng-template #selectedItem let-u>
+        @if (u) {
+          <div class="flex items-center gap-2">
+            <i class="pi pi-user"></i>
+            <span class="font-medium">{{ u.username }}</span>
+            <span class="opacity-60">&lt;{{ u.email }}&gt;</span>
+          </div>
+        }
+      </ng-template>
+      <ng-template #item let-u>
+        <div class="flex flex-col">
+          <span class="font-medium">{{ u.username }}</span>
+          <span class="text-xs opacity-70">{{ u.email }}</span>
+        </div>
+      </ng-template>
+    </p-select>
+  </div>
+
+  <!-- Rating -->
+  <div>
+    <label class="block mb-1 font-medium">Rating</label>
+    <p-rating
+      [(ngModel)]="command.rating"
+      stars="10"
+      class="text-2xl"
+    ></p-rating>
+  </div>
+
+  <!-- Title -->
+  <div>
+    <label for="title" class="block mb-1 font-medium">Title</label>
+    <input
+      id="title"
+      pInputText
+      [(ngModel)]="command.title"
+      placeholder="e.g. A masterpiece!"
+      class="w-full"
+    />
+  </div>
+
+  <!-- Description -->
+  <div>
+    <label for="desc" class="block mb-1 font-medium">Description</label>
+    <textarea
+      id="desc"
+      pTextarea
+      rows="4"
+      [(ngModel)]="command.description"
+      placeholder="Write your thoughts here…"
+      class="w-full"
+    ></textarea>
+  </div>
+
+  <!-- Submit button -->
+  <div class="pt-2">
+    <button
+      pButton
+      type="button"
+      class="w-full p-button-success"
+      (click)="createReview()"
+    >
+      <i class="pi pi-check" pButtonIcon></i>
+      <span pButtonLabel>Submit Review</span>
+    </button>
+  </div>
+</section>

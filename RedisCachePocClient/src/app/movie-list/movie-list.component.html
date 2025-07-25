@@ -1,4 +1,94 @@
-<h1 class="text-3xl font-bold underline">
-  Hello world!
-</h1>
-<p-button label="Check" />
+<section class="p-4 lg:p-8">
+  <!-- Toolbar -->
+  <header
+    class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+  >
+    <h1 class="text-3xl font-semibold tracking-tight">🎬 Movies</h1>
+
+    <div class="flex gap-3">
+      <button
+        pButton
+        type="button"
+        class="p-button-sm"
+        (click)="reload()"
+      >
+        <i class="pi pi-refresh" pButtonIcon></i>
+        <span pButtonLabel>Refresh</span>
+      </button>
+
+      <button
+        pButton
+        type="button"
+        class="p-button-sm p-button-success"
+        (click)="openAdd()"
+      >
+        <i class="pi pi-plus" pButtonIcon></i>
+        <span pButtonLabel>Add Movie</span>
+      </button>
+    </div>
+  </header>
+
+
+  <!-- PrimeNG DataView in grid layout -->
+  <p-dataView
+    [value]="movies()"
+    layout="grid"
+    [paginator]="true"
+    [rows]="12"
+    [rowsPerPageOptions]="[12, 24, 48]"
+    emptyMessage="No movies to show right now."
+  >
+    <!-- v20 GRID TEMPLATE -->
+    <ng-template #grid let-items>
+      <div class="grid grid-cols-12 gap-4">
+        <!-- iterate manually -->
+        @for (movie of items; track $index) {
+          <div class="col-span-12 sm:col-span-6 xl:col-span-4 p-2">
+            <p-card class="w-full rounded-full shadow-md">
+              <ng-template pTemplate="header">
+                <div class="flex items-center gap-2 pt-5 pl-5">
+                  <span class="text-xl font-bold leading-tight line-clamp-2">
+                    {{ movie.title }}
+                  </span>
+                </div>
+              </ng-template>
+
+              <p class="mt-2 text-sm opacity-80 line-clamp-4">
+                {{ movie.plot }}
+              </p>
+
+              <div class="mt-4 flex flex-wrap gap-2">
+                <p-tag [value]="movie.genre" severity="info" rounded></p-tag>
+                <p-tag [value]="movie.director" severity="success" rounded></p-tag>
+              </div>
+
+              <ng-template pTemplate="footer">
+                <button
+                  pButton
+                  type="button"
+                  class="p-button-sm"
+                  (click)="goTo(movie.id)"
+                >
+                  <i class="pi pi-chevron-right" pButtonIcon></i>
+                  <span pButtonLabel>Details</span>
+                </button>
+              </ng-template>
+            </p-card>
+          </div>
+        }
+
+      </div>
+    </ng-template>
+  </p-dataView>
+
+  <p-dialog
+    [(visible)]="showAdd"
+    header="Add New Movie"
+    [modal]="true"
+    [style]="{ width: '30rem' }"
+    (onHide)="closedAdd()"
+  >
+    <!-- Embed the form component -->
+    <app-add-movie (movieCreated)="onMovieCreated()"></app-add-movie>
+  </p-dialog>
+</section>

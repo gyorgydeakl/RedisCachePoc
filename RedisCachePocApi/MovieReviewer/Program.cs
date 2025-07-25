@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RedisCachePocApi.Dal;
@@ -15,9 +16,12 @@ public class Program
         // --- Services ------------------------------------------------------
         builder.Services.AddAuthorization();
         builder.Services.AddOpenApi();
-        var multiplexer = ConnectionMultiplexer
-            .Connect(builder.Configuration.GetConnectionString("RedisCache")!);
-        builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
+        builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
+        {
+            var options = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("RedisCache")!);
+            options.AllowAdmin = true;
+            return ConnectionMultiplexer.Connect(options);
+        });
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
         builder.Services.AddCors(options =>
@@ -62,10 +66,26 @@ public class Program
             })
             .WithOpenApi();
         
-        app.MapGet("/movies", async (AppDbContext db) =>
+        app.MapGet("/movies", async (AppDbContext db, IConnectionMultiplexer redis) =>
         {
-            var result = await db.Movies.Select(m => m.ToSummaryDto()).ToListAsync();
-            return TypedResults.Ok(result);
+            const string key = "movies:all";
+            var cache = redis.GetDatabase();
+            string? cachedJson = await cache.StringGetAsync(key);
+
+            if (!string.IsNullOrEmpty(cachedJson))
+            {
+                var dtoList = JsonSerializer.Deserialize<List<MovieSummaryDto>>(cachedJson)!;
+                return TypedResults.Ok(dtoList);
+            }
+
+            var dtoListFromDb = await db.Movies.Select(m => m.ToSummaryDto()).ToListAsync();
+            await cache.StringSetAsync(
+                key,
+                JsonSerializer.Serialize(dtoListFromDb),
+                TimeSpan.FromMinutes(1),
+                flags: CommandFlags.FireAndForget);
+
+            return TypedResults.Ok(dtoListFromDb);
         })
         .WithOpenApi();
 
@@ -77,17 +97,45 @@ public class Program
         })
         .WithOpenApi();
 
-        app.MapGet("/movies/{id:guid}", async (Guid id, AppDbContext db) =>
+        app.MapGet("/movies/{id:guid}", async (Guid id, AppDbContext db, IConnectionMultiplexer redis) =>
         {
-            var result = await db.Movies.Where(m => m.Id == id).Select(m => m.ToDetailsDto()).SingleOrDefaultAsync();
-            return TypedResults.Ok(result);
+            var key = $"movie:{id:N}";
+            var cache = redis.GetDatabase();
+            
+            string? cachedJson = await cache.StringGetAsync(key);
+            if (!string.IsNullOrEmpty(cachedJson))
+            {
+                var dto = JsonSerializer.Deserialize<MovieDetailsDto>(cachedJson)!;
+                return TypedResults.Ok(dto);
+            }
+
+            var dtoFromDb = await db.Movies
+                .Where(m => m.Id == id)
+                .Include(m => m.Reviews)
+                .ThenInclude(r => r.User)
+                .Select(m => m.ToDetailsDto())
+                .SingleOrDefaultAsync();
+
+            if (dtoFromDb is null)
+            {
+                return Results.NotFound();
+            }
+
+            await cache.StringSetAsync(
+                key,
+                JsonSerializer.Serialize(dtoFromDb),
+                TimeSpan.FromMinutes(1),
+                flags: CommandFlags.FireAndForget);
+
+            return TypedResults.Ok(dtoFromDb);
         })
         .WithOpenApi();
 
         app.MapPost("/movies/{id:guid}/reviews", async (Guid id, [FromBody] CreateReviewDto dto, AppDbContext db) =>
         {
-            var newReview = db.Reviews.Add(dto.ToReview()).Entity;
+            var newReview = db.Reviews.Add(dto.ToReview(id, DateTime.UtcNow)).Entity;
             await db.SaveChangesAsync();
+            await db.Entry(newReview).Reference(r => r.User).LoadAsync();
             return TypedResults.Ok(newReview.ToDto());
         })
         .WithOpenApi();
@@ -98,7 +146,35 @@ public class Program
             return TypedResults.Ok(result);
         })
         .WithOpenApi();
-        
+            
+        app.MapGet("/users", async (AppDbContext db) =>
+        {
+            var result = await db.Users.Select(u => u.ToDto()).ToListAsync();
+            return TypedResults.Ok(result);
+        })
+        .WithOpenApi();
+
+        app.MapPost("/users", async ([FromBody] CreateUserDto command, AppDbContext db) =>
+        {
+            var user = db.Users.Add(command.ToUser()).Entity;
+            await db.SaveChangesAsync();
+            return TypedResults.Ok(user.ToDto());
+        })
+        .WithOpenApi();
+
+        app.MapDelete("cache/clear", async (IConnectionMultiplexer mux) =>
+        {
+            const int dbNumber = 0;                         
+
+            foreach (var endpoint in mux.GetEndPoints())
+            {
+                await mux.GetServer(endpoint).FlushDatabaseAsync(dbNumber);
+            }
+
+            return TypedResults.NoContent(); 
+        })
+        .WithOpenApi();
+    
         app.Run();
     }
 }

@@ -9,8 +9,7 @@
  */
 
 
-export interface UserDto { 
-    id: string;
+export interface CreateUserDto { 
     username: string;
     bio: string;
     email: string;

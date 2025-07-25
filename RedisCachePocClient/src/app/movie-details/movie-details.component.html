@@ -1,0 +1,67 @@
+<section class="p-4 lg:p-8 max-w-3xl mx-auto">
+  <!-- ⏪ Back‑to‑list -->
+  <button
+    pButton
+    type="button"
+    class="mb-6 p-button-sm"
+    routerLink="/movies"
+  >
+    <i class="pi pi-arrow-left" pButtonIcon></i>
+    <span pButtonLabel>Back</span>
+  </button>
+
+  <!-- ░░░  LOADING / ERROR  ░░░ -->
+  @if (movie() === null) {
+    <div class="flex items-center gap-3 text-lg">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span class="opacity-70">Loading movie details…</span>
+    </div>
+  } @else {
+    @let m = movie()!;
+
+    <!-- ░░░  MOVIE HEADER  ░░░ -->
+    <h1 class="text-4xl font-semibold leading-tight mb-2">{{ m.title }}</h1>
+
+    <div class="flex flex-wrap gap-2 mb-6">
+      <p-tag [value]="m.genre" severity="info" rounded></p-tag>
+      <p-tag [value]="m.director" severity="success" rounded></p-tag>
+    </div>
+
+    <!-- ░░░  PLOT  ░░░ -->
+    <p-card class="mb-8 rounded-full shadow-md">
+      <ng-template pTemplate="header">
+        <h2 class="text-2xl font-medium pl-5 pt-5">Plot</h2>
+      </ng-template>
+      <p class="leading-relaxed text-gray-800 whitespace-pre-line">
+        {{ m.plot }}
+      </p>
+    </p-card>
+
+    <!-- ░░░  REVIEWS  ░░░ -->
+    <p-card class="rounded-full shadow-md p-5">
+      <ng-template pTemplate="header">
+        <h2 class="text-2xl font-medium flex items-center gap-2 pl-5 pt-5">
+          <i class="pi pi-comments text-primary-500"></i> Reviews
+        </h2>
+      </ng-template>
+
+      @if (m.reviews?.length) {
+        <div class="space-y-6">
+          @for (rev of m.reviews; track rev.id) {
+            <article class="border-l-4 border-primary-500 pl-4">
+              <h3 class="font-semibold text-lg mb-1">{{ rev.userName }}</h3>
+              <p class="opacity-80 whitespace-pre-line">{{ rev.description }}</p>
+            </article>
+          }
+        </div>
+      } @else {
+        <p class="italic text-gray-500">No reviews yet.</p>
+      }
+      <app-add-review
+        class="block mt-8"
+        [movieId]="m.id"
+        (reviewAdded)="addReview($event)"
+      ></app-add-review>
+    </p-card>
+  }
+</section>

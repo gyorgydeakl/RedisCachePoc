@@ -1,0 +1,8 @@
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-textarea {
+  @apply focus:ring-2;
+}
+
+:host ::ng-deep .p-button {
+  @apply rounded-full;
+}

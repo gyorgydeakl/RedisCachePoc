@@ -1,0 +1,68 @@
+<section class="p-6 max-w-xl mx-auto">
+  <h1 class="text-3xl font-semibold mb-6">Add New Movie</h1>
+
+  <div class="flex flex-col gap-4">
+    <!-- Title -->
+    <div>
+      <label for="title" class="block mb-1 font-medium">Title</label>
+      <input
+        id="title"
+        pInputText
+        [(ngModel)]="command.title"
+        placeholder="Enter movie title"
+        class="w-full"
+      />
+    </div>
+
+    <!-- Genre -->
+    <div>
+      <label for="genre" class="block mb-1 font-medium">Genre</label>
+      <input
+        id="genre"
+        pInputText
+        [(ngModel)]="command.genre"
+        placeholder="Enter movie genre"
+        class="w-full"
+      />
+    </div>
+
+    <!-- Director -->
+    <div>
+      <label for="director" class="block mb-1 font-medium">Director</label>
+      <input
+        id="director"
+        pInputText
+        [(ngModel)]="command.director"
+        placeholder="Enter director's name"
+        class="w-full"
+      />
+    </div>
+
+    <!-- Plot -->
+    <div>
+      <label for="plot" class="block mb-1 font-medium">Plot</label>
+      <textarea
+        id="plot"
+        pTextarea
+        [(ngModel)]="command.plot"
+        placeholder="Enter a short plot"
+        rows="4"
+        class="w-full"
+      ></textarea>
+    </div>
+
+    <!-- Submit button -->
+    <div class="pt-4">
+      <button
+        pButton
+        type="button"
+        (click)="createMovie()"
+        class="w-full p-button-success"
+      >
+        <!-- NEW: icon + label directives -->
+        <i class="pi pi-check" pButtonIcon></i>
+        <span pButtonLabel>Create Movie</span>
+      </button>
+    </div>
+  </div>
+</section>

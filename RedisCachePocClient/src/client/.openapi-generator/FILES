@@ -11,6 +11,7 @@ index.ts
 model/cacheItem.ts
 model/createMovieDto.ts
 model/createReviewDto.ts
+model/createUserDto.ts
 model/models.ts
 model/movieDetailsDto.ts
 model/movieSummaryDto.ts
