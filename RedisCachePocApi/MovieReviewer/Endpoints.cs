@@ -288,7 +288,7 @@ public static class Endpoints
             .WithName("GenerateUsers");
 
         app.MapPost("/movies/{id:guid}/generate-reviews", 
-                async (Guid id, [FromQuery] int count, AppDbContext db, IConnectionMultiplexer redis) =>
+            async (Guid id, [FromQuery] int count, AppDbContext db, IConnectionMultiplexer redis) =>
         {
             var movie = await db.Movies.FindAsync(id);
             if (movie is null)

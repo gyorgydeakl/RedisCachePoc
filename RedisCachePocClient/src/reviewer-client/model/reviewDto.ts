@@ -16,5 +16,6 @@ export interface ReviewDto {
     description: string;
     date: string;
     userName: string;
+    userId: string;
 }
 

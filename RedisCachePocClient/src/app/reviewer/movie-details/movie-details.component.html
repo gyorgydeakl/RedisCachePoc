@@ -1,4 +1,4 @@
-<section class="p-4 lg:p-8 max-w-4xl mx-auto">
+<section class="p-4 lg:p-8 max-w-350 mx-auto">
   <!-- ⏪ Back‑to‑list -->
   <button
     pButton
@@ -34,9 +34,12 @@
       <ng-template pTemplate="header">
         <h2 class="text-2xl font-medium pl-5 pt-5">Plot</h2>
       </ng-template>
-      <p class="leading-relaxed text-gray-800 whitespace-pre-line">
-        {{ m.plot }}
-      </p>
+      <p-scroll-panel class="max-h-100">
+        <p class="leading-relaxed text-gray-800 whitespace-pre-line">
+          {{ m.plot }}
+        </p>
+      </p-scroll-panel>
+
     </p-card>
 
     <!-- ░░░  REVIEWS  ░░░ -->
@@ -48,39 +51,55 @@
           <!-- spacer pushes buttons to the right -->
           <span class="flex-grow"></span>
 
-          <!-- 🔘 Generate‑reviews -->
           <button
             pButton
-            type="button"
-            class="p-button-sm"
-            (click)="generateReviews()"
-          >
-            <i class="pi pi-plus" pButtonIcon></i>
-            <span pButtonLabel>Generate</span>
-          </button>
-
-          <!-- 🔄 Reload -->
-          <button
-            pButton
+            text
             type="button"
             class="p-button-sm ml-2"
             (click)="movie.reload()"
           >
             <i class="pi pi-refresh" pButtonIcon></i>
-            <span pButtonLabel>Reload</span>
+          </button>
+
+          <button
+            pButton
+            text
+            type="button"
+            class="p-button-sm"
+            (click)="generateReviews()"
+          >
+            <i class="pi pi-plus" pButtonIcon></i>
           </button>
         </h2>
       </ng-template>
 
       @if (m.reviews?.length) {
-        <div class="space-y-6">
-          @for (rev of m.reviews; track rev.id) {
-            <article class="border-l-4 border-primary-500 pl-4">
-              <h3 class="font-semibold text-lg mb-1">{{ rev.userName }}</h3>
-              <p class="opacity-80 whitespace-pre-line">{{ rev.description }}</p>
-            </article>
-          }
-        </div>
+        <p-scroll-panel class="max-h-100">
+          <div class="space-y-6">
+            @for (rev of m.reviews; track rev.id) {
+              <article class="border-l-4 border-primary-500 pl-4 space-y-1">
+                <div class="flex items-center gap-3">
+                  <a
+                    [routerLink]="['/planner/users', rev.userId]"
+                    class="font-semibold text-lg hover:underline focus:outline-none"
+                  >
+                    {{ rev.userName }}
+                  </a>
+                  <p-rating
+                    [ngModel]="rev.rating"
+                    [readonly]="true"
+                    pStyleClass="text-base align-middle"
+                  ></p-rating>
+                </div>
+
+                <h4 class="text-base font-medium">{{ rev.title }}</h4>
+                <p class="opacity-80 whitespace-pre-line">{{ rev.description }}</p>
+                <small class="text-sm text-gray-500">{{ rev.date | date:'mediumDate' }}</small>
+              </article>
+            }
+          </div>
+        </p-scroll-panel>
+
       } @else {
         <p class="italic text-gray-500">No reviews yet.</p>
       }

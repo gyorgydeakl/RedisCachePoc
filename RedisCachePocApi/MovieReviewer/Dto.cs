@@ -19,6 +19,7 @@ public record ReviewDto
     public required string Description { get; set; }
     public required DateTime Date { get; set; }
     public required string UserName { get; set; }
+    public required Guid UserId { get; set; }
 }
 
 public record MovieDetailsDto
@@ -127,7 +128,8 @@ public static class DtoExtensions
             Title = review.Title,
             Description = review.Description,
             Date = review.Date,
-            UserName = review.User.Username
+            UserName = review.User.Username,
+            UserId = review.UserId
         };
     }
     public static UserDto ToDto(this User user)

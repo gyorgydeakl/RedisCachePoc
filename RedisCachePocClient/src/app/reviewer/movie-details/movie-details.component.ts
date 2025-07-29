@@ -1,4 +1,4 @@
-import {Component, inject, input, OnInit, signal} from '@angular/core';
+import {Component, inject, input, ResourceRef} from '@angular/core';
 import {MovieDetailsDto, MovieReviewerClient, ReviewDto} from '../../../reviewer-client';
 import {Card} from 'primeng/card';
 import {MessageService, PrimeTemplate} from 'primeng/api';
@@ -8,6 +8,11 @@ import {Tag} from 'primeng/tag';
 import {AddReviewComponent} from '../add-review/add-review.component';
 import {resourceObs} from '../../utils';
 import {ProgressSpinner} from 'primeng/progressspinner';
+import {ScrollPanel} from 'primeng/scrollpanel';
+import {Rating} from 'primeng/rating';
+import {FormsModule} from '@angular/forms';
+import {DatePipe} from '@angular/common';
+import {StyleClass} from 'primeng/styleclass';
 
 @Component({
   selector: 'app-movie-details',
@@ -20,7 +25,12 @@ import {ProgressSpinner} from 'primeng/progressspinner';
     ButtonIcon,
     Tag,
     AddReviewComponent,
-    ProgressSpinner
+    ProgressSpinner,
+    ScrollPanel,
+    Rating,
+    FormsModule,
+    DatePipe,
+    StyleClass
   ],
   templateUrl: './movie-details.component.html',
   styleUrl: './movie-details.component.css'
@@ -30,7 +40,7 @@ export class MovieDetailsComponent {
   private readonly messageService = inject(MessageService);
 
   readonly movieId = input.required<string>()
-  protected readonly movie = resourceObs(() => this.movieId(), param => this.client.moviesIdGet(param));
+  protected readonly movie: ResourceRef<MovieDetailsDto> = resourceObs(() => this.movieId(), param => this.client.moviesIdGet(param));
 
   addReview(r: ReviewDto) {
     if (!this.movie.hasValue()) {

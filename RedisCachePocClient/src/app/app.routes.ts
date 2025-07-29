@@ -4,7 +4,6 @@ import {MovieDetailsComponent as ReviewerMovieDetailsComponent} from './reviewer
 import {MovieDetailsComponent as PlannerMovieDetailsComponent} from './planner/movie-details/movie-details.component';
 import {AddUserComponent} from './reviewer/add-user/add-user.component';
 import {UserListComponent} from './planner/user-list/user-list.component';
-import {WatchlistComponent} from './planner/watchlist/watchlist.component';
 import {UserDetailsComponent} from './planner/user-details/user-details.component';
 
 export const routes: Routes = [

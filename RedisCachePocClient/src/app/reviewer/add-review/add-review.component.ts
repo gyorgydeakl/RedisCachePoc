@@ -1,12 +1,12 @@
-import {Component, inject, input, output, signal} from '@angular/core';
-import {CreateReviewDto, MovieReviewerClient, ReviewDto, UserDto} from '../../../reviewer-client';
+import {Component, inject, input, output} from '@angular/core';
+import {CreateReviewDto, MovieReviewerClient, ReviewDto} from '../../../reviewer-client';
 import {FormsModule} from '@angular/forms';
 import {Textarea} from 'primeng/textarea';
 import {ButtonDirective, ButtonIcon, ButtonLabel} from 'primeng/button';
 import {Rating} from 'primeng/rating';
 import {InputText} from 'primeng/inputtext';
-import {PrimeTemplate} from 'primeng/api';
 import {Select} from 'primeng/select';
+import {resourceObsNoParams} from '../../utils';
 
 @Component({
   selector: 'app-add-review',
@@ -28,7 +28,7 @@ export class AddReviewComponent {
 
   movieId = input.required<string>();
   reviewAdded = output<ReviewDto>();
-  users = signal<UserDto[]>([]);
+  readonly users = resourceObsNoParams(() => this.client.usersGet());
   command: CreateReviewDto = {
     rating: 0,
     title: '',
@@ -36,9 +36,7 @@ export class AddReviewComponent {
     userId: ''
   }
   selectLabel = "Select a user";
-  constructor() {
-    this.client.usersGet().subscribe(users => this.users.set(users));
-  }
+
   createReview() {
     this.client.moviesIdReviewsPost(this.movieId(), this.command).subscribe(r => this.reviewAdded.emit(r))
   }

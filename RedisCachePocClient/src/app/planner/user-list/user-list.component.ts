@@ -1,19 +1,18 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import {Router, RouterLink} from '@angular/router';
 import { MoviePlannerClient } from '../../../planner-client';
-import {MovieReviewerClient, UserDto} from '../../../reviewer-client';
+import {MovieReviewerClient} from '../../../reviewer-client';
 
-import {Button, ButtonDirective, ButtonIcon, ButtonLabel} from 'primeng/button';
+import {ButtonDirective, ButtonIcon, ButtonLabel} from 'primeng/button';
 import {TableModule} from 'primeng/table';
-import {resourceObs, resourceObsNoParams} from '../../utils';
+import {resourceObsNoParams} from '../../utils';
 import {ProgressSpinner} from 'primeng/progressspinner';
-import {Message} from 'primeng/message';
 import {MessageService} from 'primeng/api';
 
 @Component({
   selector: 'app-user-list',
   standalone: true,
-  imports: [ButtonDirective, ButtonLabel, TableModule, ButtonIcon, ProgressSpinner],
+  imports: [ButtonDirective, ButtonLabel, TableModule, ButtonIcon, ProgressSpinner, RouterLink],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.css'
 })

@@ -1,11 +1,11 @@
-import {Component, inject, input, OnInit, resource, signal} from '@angular/core';
+import {Component, inject, input} from '@angular/core';
 import { Router } from '@angular/router';
-import { MoviePlannerClient, WatchlistItemDto } from '../../../planner-client';
+import { MoviePlannerClient } from '../../../planner-client';
 import {TableModule} from 'primeng/table';
 import {ButtonDirective, ButtonIcon, ButtonLabel} from 'primeng/button';
-import {firstValueFrom} from 'rxjs';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {resourceObs} from '../../utils';
+import {MessageService} from 'primeng/api';
 
 @Component({
   selector: 'app-watchlist',
@@ -23,6 +23,7 @@ import {resourceObs} from '../../utils';
 })
 export class WatchlistComponent {
   private readonly client  = inject(MoviePlannerClient);
+  private readonly messageService  = inject(MessageService);
   private readonly router  = inject(Router);
 
   readonly userId = input.required<string>();
@@ -30,7 +31,14 @@ export class WatchlistComponent {
     resourceObs(() => this.userId(), param => this.client.getWatchList(param))
 
   generateWatchlist() {
-    this.client.generateWatchList(this.userId(), 10).subscribe(_ => this.items.reload());
+    this.client.generateWatchList(this.userId(), 10).subscribe(_ => {
+      this.items.reload();
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Watchlist generated',
+        detail: `Generated watchlist!`
+      });
+    });
   }
 
   goTo(movieId: string) {
