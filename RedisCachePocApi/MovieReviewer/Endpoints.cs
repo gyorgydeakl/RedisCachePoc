@@ -92,12 +92,66 @@ public static class Endpoints
         })
         .WithOpenApi();
             
-        app.MapGet("/users", async (AppDbContext db) =>
+        app.MapGet("/users", async (AppDbContext db, IConnectionMultiplexer redis) =>
         {
-            var result = await db.Users.Select(u => u.ToDto()).ToListAsync();
-            return TypedResults.Ok(result);
+            const string key = "users:all";
+
+            var cache = redis.GetDatabase();
+            string? cachedJson = await cache.StringGetAsync(key);
+
+            if (!string.IsNullOrEmpty(cachedJson))
+            {
+                var dtoList = JsonSerializer.Deserialize<List<UserDto>>(cachedJson)!;
+                return TypedResults.Ok(dtoList);
+            }
+
+            var dtoListFromDb = await db.Users
+                .Select(u => u.ToDto())
+                .ToListAsync();
+
+            var ttl = TimeSpan.FromMinutes(10);
+            await cache.StringSetAsync(
+                key,
+                JsonSerializer.Serialize(dtoListFromDb),
+                ttl,
+                flags: CommandFlags.FireAndForget);
+
+            return TypedResults.Ok(dtoListFromDb);
         })
         .WithOpenApi();
+
+        app.MapGet("user/{userId:guid}", async (Guid userId, AppDbContext db, IConnectionMultiplexer redis) =>
+            {
+                var key = $"user:{userId:N}";
+
+                var cache = redis.GetDatabase();
+                string? cachedJson = await cache.StringGetAsync(key);
+
+                if (!string.IsNullOrEmpty(cachedJson))
+                {
+                    var dto = JsonSerializer.Deserialize<UserDto>(cachedJson)!;
+                    return TypedResults.Ok(dto);
+                }
+
+                var user = await db.Users
+                    .Where(u => u.Id == userId)
+                    .SingleOrDefaultAsync();
+
+                if (user is null)
+                    return Results.NotFound();
+
+                var dtoFromDb = user.ToDto();
+
+                await cache.StringSetAsync(
+                    key,
+                    JsonSerializer.Serialize(dtoFromDb),
+                    expiry: TimeSpan.FromMinutes(15),
+                    flags: CommandFlags.FireAndForget);
+
+                return TypedResults.Ok(dtoFromDb);
+            })
+            .WithOpenApi()
+            .WithName("GetUser");
 
         app.MapPost("/users", async ([FromBody] CreateUserDto command, AppDbContext db) =>
         {
@@ -126,7 +180,7 @@ public static class Endpoints
                 .RuleFor(m => m.Title, f => f.Lorem.Sentence(3, 2))
                 .RuleFor(m => m.Genre, f => f.PickRandom("Action", "Drama", "Comedy", "Sci‑Fi", "Thriller", "Fantasy"))
                 .RuleFor(m => m.Director, f => f.Name.FullName())
-                .RuleFor(m => m.Plot, f => f.Lorem.Paragraphs(1, 3));
+                .RuleFor(m => m.Plot, f => f.Lorem.Paragraphs(100, 300));
 
             var userFaker = new Faker<User>()
                 .RuleFor(u => u.Email, f => f.Internet.Email())
@@ -176,6 +230,63 @@ public static class Endpoints
         })
         .WithOpenApi()
         .WithName("AddRandomData");
+
+        app.MapPost("movies/generate", async ([FromQuery] int count, AppDbContext db, IConnectionMultiplexer redis) =>
+            {
+                if (count <= 0)
+                {
+                    return Results.BadRequest("Parameter 'count' must be a positive number.");
+                }
+
+                List<string> genres = ["Action", "Comedy", "Drama", "Sci‑Fi", "Thriller", "Fantasy"];
+
+                var movieFaker = new Faker<Movie>()
+                    .RuleFor(m => m.Title, f => f.Lorem.Sentence(3, 2))
+                    .RuleFor(m => m.Genre, f => f.PickRandom(genres))
+                    .RuleFor(m => m.Director, f => f.Name.FullName())
+                    .RuleFor(m => m.Plot, f => f.Lorem.Paragraphs(100, 300));
+
+                var movies = movieFaker.Generate(count);
+
+                db.Movies.AddRange(movies);
+                await db.SaveChangesAsync();
+
+                await redis.GetDatabase().KeyDeleteAsync("movies:all");
+
+                return TypedResults.Ok(new
+                {
+                    MoviesInserted = movies.Count
+                });
+            })
+            .WithOpenApi()
+            .WithName("GenerateMovies");
+
+        app.MapPost("users/generate", async ([FromQuery] int count, AppDbContext db, IConnectionMultiplexer redis) =>
+            {
+                if (count <= 0)
+                {
+                    return Results.BadRequest("Parameter 'count' must be a positive number.");
+                }
+                var userFaker = new Bogus.Faker<User>()
+                    .RuleFor(u => u.Email,    f => f.Internet.Email())
+                    .RuleFor(u => u.Username, f => f.Internet.UserName())
+                    .RuleFor(u => u.Bio,      f => f.Lorem.Paragraph());
+
+                var users = userFaker.Generate(count);
+
+                db.Users.AddRange(users);
+                await db.SaveChangesAsync();
+
+                await redis.GetDatabase().KeyDeleteAsync("users:all");
+
+                return TypedResults.Ok(new
+                {
+                    UsersInserted = users.Count
+                });
+            })
+            .WithOpenApi()
+            .WithName("GenerateUsers");
+
         app.MapPost("/movies/{id:guid}/generate-reviews", 
                 async (Guid id, [FromQuery] int count, AppDbContext db, IConnectionMultiplexer redis) =>
         {

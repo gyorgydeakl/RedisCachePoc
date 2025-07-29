@@ -6,6 +6,8 @@ import {ButtonDirective, ButtonIcon, ButtonLabel} from 'primeng/button';
 import {RouterLink} from '@angular/router';
 import {Tag} from 'primeng/tag';
 import {AddReviewComponent} from '../add-review/add-review.component';
+import {resourceObs} from '../../utils';
+import {ProgressSpinner} from 'primeng/progressspinner';
 
 @Component({
   selector: 'app-movie-details',
@@ -17,27 +19,24 @@ import {AddReviewComponent} from '../add-review/add-review.component';
     ButtonLabel,
     ButtonIcon,
     Tag,
-    AddReviewComponent
+    AddReviewComponent,
+    ProgressSpinner
   ],
   templateUrl: './movie-details.component.html',
   styleUrl: './movie-details.component.css'
 })
-export class MovieDetailsComponent implements OnInit {
+export class MovieDetailsComponent {
   private readonly client = inject(MovieReviewerClient);
   private readonly messageService = inject(MessageService);
 
   readonly movieId = input.required<string>()
-  protected readonly movie = signal<MovieDetailsDto | null>(null);
-
-  ngOnInit(): void {
-    this.reload();
-  }
-  reload() {
-    this.client.moviesIdGet(this.movieId()).subscribe(movie => this.movie.set(movie));
-  }
+  protected readonly movie = resourceObs(() => this.movieId(), param => this.client.moviesIdGet(param));
 
   addReview(r: ReviewDto) {
-    const current = this.movie();
+    if (!this.movie.hasValue()) {
+      return;
+    }
+    const current = this.movie.value();
     if (!current) return;
 
     this.movie.set({
@@ -48,11 +47,11 @@ export class MovieDetailsComponent implements OnInit {
 
   generateReviews() {
     this.client.generateReviewsForMovie(this.movieId(), 10).subscribe(r => {
-      this.reload();
+      this.movie.reload();
       this.messageService.add({
         severity: 'success',
         summary: 'Reviews generated',
-        detail: `Generated ${r.length} reviews for movie '${this.movie()?.title}'!`
+        detail: `Generated ${r.length} reviews for movie '${this.movie.value()?.title}'!`
       });
     });
   }

@@ -1,19 +1,29 @@
-<section class="p-4 lg:p-8">
+<section class="pt-4">
   <!-- Toolbar -->
   <header
-    class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+    class="mb-6 flex flex-row gap-4 justify-between"
   >
-    <h2 class="text-3xl font-semibold tracking-tight">🎞️ Watch List</h2>
+    <h2 class="text-xl font-semibold tracking-tight">Watch List</h2>
 
-    <button pButton type="button" class="p-button-sm" (click)="loadWatchlist()">
-      <i class="pi pi-refresh" pButtonIcon></i>
-      <span pButtonLabel>Refresh</span>
-    </button>
+    <div class="flex flex-row justify-end gap-2">
+      <button pButton text type="button" class="p-button-sm" (click)="items.reload()">
+        <i class="pi pi-refresh" pButtonIcon></i>
+      </button>
+      <button pButton text type="button" class="p-button-sm" (click)="generateWatchlist()">
+        <i class="pi pi-plus" pButtonIcon></i>
+      </button>
+    </div>
   </header>
-
-  <!-- PrimeNG table -->
-  <p-table
-    [value]="items()"
+  @if (items.isLoading()) {
+    <div class="flex justify-center">
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+  } @else if (!items.hasValue()) {
+    <p class="text-center text-gray-500">No entries in watch list.</p>
+  }
+  @else {
+    <p-table
+    [value]="items.value()"
     [paginator]="true"
     [rows]="10"
     class="shadow rounded-lg"
@@ -53,4 +63,6 @@
       </tr>
     </ng-template>
   </p-table>
+
+  }
 </section>

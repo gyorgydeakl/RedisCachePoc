@@ -10,7 +10,7 @@ git_push.sh
 index.ts
 model/models.ts
 model/userDto.ts
-model/watchListItemDto.ts
+model/watchlistItemDto.ts
 param.ts
 provide-api.ts
 variables.ts

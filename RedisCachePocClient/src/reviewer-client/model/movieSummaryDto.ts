@@ -14,6 +14,6 @@ export interface MovieSummaryDto {
     title: string;
     genre: string;
     director: string;
-    plot: string;
+    plotShortened: string;
 }
 

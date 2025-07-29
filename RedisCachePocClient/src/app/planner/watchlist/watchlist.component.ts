@@ -1,8 +1,11 @@
-import { Component, inject, input, OnInit, signal } from '@angular/core';
+import {Component, inject, input, OnInit, resource, signal} from '@angular/core';
 import { Router } from '@angular/router';
-import { MoviePlannerClient, WatchListItemDto } from '../../../planner-client';
+import { MoviePlannerClient, WatchlistItemDto } from '../../../planner-client';
 import {TableModule} from 'primeng/table';
 import {ButtonDirective, ButtonIcon, ButtonLabel} from 'primeng/button';
+import {firstValueFrom} from 'rxjs';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {resourceObs} from '../../utils';
 
 @Component({
   selector: 'app-watchlist',
@@ -11,31 +14,26 @@ import {ButtonDirective, ButtonIcon, ButtonLabel} from 'primeng/button';
     TableModule,
     ButtonDirective,
     ButtonIcon,
-    ButtonLabel
+    ButtonLabel,
+    ProgressSpinner
 
   ],
   templateUrl: './watchlist.component.html',
   styleUrl: './watchlist.component.css'
 })
-export class WatchlistComponent implements OnInit {
+export class WatchlistComponent {
   private readonly client  = inject(MoviePlannerClient);
   private readonly router  = inject(Router);
 
-  /** Parent supplies user id */
-  userId = input.required<string>();
+  readonly userId = input.required<string>();
+  readonly items =
+    resourceObs(() => this.userId(), param => this.client.getWatchList(param))
 
-  /** Reactive data store */
-  readonly items = signal<WatchListItemDto[]>([]);
-
-  ngOnInit() {
-    this.loadWatchlist();
-  }
-
-  loadWatchlist() {
-    this.client.getWatchList(this.userId()).subscribe(i => this.items.set(i));
+  generateWatchlist() {
+    this.client.generateWatchList(this.userId(), 10).subscribe(_ => this.items.reload());
   }
 
   goTo(movieId: string) {
-    this.router.navigate(['/reviewer/movies', movieId]);
+    this.router.navigate(['/planner/movies', movieId]);
   }
 }

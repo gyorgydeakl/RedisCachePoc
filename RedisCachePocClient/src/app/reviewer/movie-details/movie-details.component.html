@@ -1,23 +1,25 @@
-<section class="p-4 lg:p-8 max-w-3xl mx-auto">
+<section class="p-4 lg:p-8 max-w-4xl mx-auto">
   <!-- ⏪ Back‑to‑list -->
   <button
     pButton
     type="button"
     class="mb-6 p-button-sm"
-    routerLink="/movies"
+    routerLink="reviewer/movies"
   >
     <i class="pi pi-arrow-left" pButtonIcon></i>
     <span pButtonLabel>Back</span>
   </button>
 
   <!-- ░░░  LOADING / ERROR  ░░░ -->
-  @if (movie() === null) {
-    <div class="flex items-center gap-3 text-lg">
-      <i class="pi pi-spin pi-spinner"></i>
-      <span class="opacity-70">Loading movie details…</span>
+  @if (movie.isLoading()) {
+    <div class="flex items-center">
+      <p-progressSpinner></p-progressSpinner>
     </div>
-  } @else {
-    @let m = movie()!;
+  } @else if (!movie.hasValue()) {
+    <p class="text-center text-gray-500">Movie was not found.</p>
+  }
+  @else {
+    @let m = movie.value();
 
     <!-- ░░░  MOVIE HEADER  ░░░ -->
     <h1 class="text-4xl font-semibold leading-tight mb-2">{{ m.title }}</h1>
@@ -62,7 +64,7 @@
             pButton
             type="button"
             class="p-button-sm ml-2"
-            (click)="reload()"
+            (click)="movie.reload()"
           >
             <i class="pi pi-refresh" pButtonIcon></i>
             <span pButtonLabel>Reload</span>

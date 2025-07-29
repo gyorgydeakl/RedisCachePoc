@@ -9,7 +9,7 @@
  */
 
 
-export interface WatchListItemDto { 
+export interface WatchlistItemDto { 
     id: string;
     title: string;
     movieId: string;

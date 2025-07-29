@@ -8,7 +8,7 @@ public record MovieSummaryDto
     public required string Title { get; set; }
     public required string Genre { get; set; }
     public required string Director { get; set; }
-    public required string Plot { get; set; }
+    public required string PlotShortened { get; set; }
 }
 
 public record ReviewDto
@@ -101,7 +101,7 @@ public static class DtoExtensions
             Title = movie.Title,
             Genre = movie.Genre,
             Director = movie.Director,
-            Plot = movie.Plot
+            PlotShortened = movie.Plot[..Math.Min(movie.Plot.Length, 500)]
         };
     }
 

@@ -1,0 +1,40 @@
+<section class="p-4 lg:p-8 max-w-4xl mx-auto">
+  <!-- ⏪ Back‑to‑list -->
+  <button
+    pButton
+    type="button"
+    class="mb-6 p-button-sm"
+    routerLink="reviewer/movies"
+  >
+    <i class="pi pi-arrow-left" pButtonIcon></i>
+    <span pButtonLabel>Back</span>
+  </button>
+
+  <!-- ░░░  LOADING / ERROR  ░░░ -->
+  @if (movie() === null) {
+    <div class="flex items-center gap-3 text-lg">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span class="opacity-70">Loading movie details…</span>
+    </div>
+  } @else {
+    @let m = movie()!;
+
+    <!-- ░░░  MOVIE HEADER  ░░░ -->
+    <h1 class="text-4xl font-semibold leading-tight mb-2">{{ m.title }}</h1>
+
+    <div class="flex flex-wrap gap-2 mb-6">
+      <p-tag [value]="m.genre" severity="info" rounded></p-tag>
+      <p-tag [value]="m.director" severity="success" rounded></p-tag>
+    </div>
+
+    <!-- ░░░  PLOT  ░░░ -->
+    <p-card class="mb-8 rounded-full shadow-md">
+      <ng-template pTemplate="header">
+        <h2 class="text-2xl font-medium pl-5 pt-5">Plot</h2>
+      </ng-template>
+      <p class="leading-relaxed text-gray-800 whitespace-pre-line">
+        {{ m.plot }}
+      </p>
+    </p-card>
+  }
+</section>

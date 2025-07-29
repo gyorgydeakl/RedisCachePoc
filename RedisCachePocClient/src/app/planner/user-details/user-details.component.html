@@ -1,0 +1,42 @@
+<!-- user-details.component.html -->
+@if (user.isLoading()) {
+  <div class="flex h-40 items-center justify-center">
+    <p-progressSpinner aria-label="Loading user details"></p-progressSpinner>
+  </div>
+} @else if (user.error()) {
+  <p-message severity="error" [closable]="false">
+    {{ user.error()?.message || 'Unable to load user details.' }}
+  </p-message>
+} @else {
+  <div class="space-y-6">
+    <!-- ❶ user profile card -->
+    <p-card class="mx-auto max-w-4xl p-2 m-2">
+      <ng-template pTemplate="header">
+        <div class="flex items-center gap-3">
+          <p-avatar shape="circle" class="font-semibold">
+            {{ user.value()?.username?.[0] | uppercase }}
+          </p-avatar>
+
+          <div>
+            <h2 class="text-lg font-semibold">
+              {{ user.value()?.username }}
+            </h2>
+            <span class="block text-sm text-gray-500">
+              {{ user.value()?.email }}
+            </span>
+          </div>
+        </div>
+      </ng-template>
+
+      <p class="mt-4 whitespace-pre-wrap">
+        {{ user.value()?.bio || 'No bio provided.' }}
+      </p>
+      <app-watchlist
+        [userId]="userId()"
+        class="block mx-auto max-w-4xl"
+      ></app-watchlist>
+    </p-card>
+
+
+  </div>
+}

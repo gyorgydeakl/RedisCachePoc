@@ -1,19 +1,30 @@
 <section class="p-4 lg:p-8">
   <!-- Toolbar -->
-  <header
-    class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
-  >
+  <header class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
     <h1 class="text-3xl font-semibold tracking-tight">👤 Users</h1>
 
-    <button pButton type="button" class="p-button-sm" (click)="loadUsers()">
-      <i class="pi pi-refresh" pButtonIcon></i>
-      <span pButtonLabel>Refresh</span>
-    </button>
+    <div class="flex justify-end">
+      <button pButton text type="button" class="p-button-sm" (click)="users.reload()">
+        <i class="pi pi-refresh" pButtonIcon></i>
+      </button>
+
+      <button pButton text type="button" class="p-button-sm p-button-success" (click)="generateUsers()">
+        <i class="pi pi-plus" pButtonIcon></i>
+        <span pButtonLabel>Generate Users</span>
+      </button>
+    </div>
+
   </header>
 
-  <!-- PrimeNG 20 table -->
-  <p-table
-    [value]="users()"
+  @if (users.isLoading()) {
+    <div class="flex justify-center">
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+  } @else if (!users.hasValue()) {
+    <p class="text-center text-gray-500">No users found.</p>
+  } @else {
+    <p-table
+    [value]="users.value()"
     sortMode="multiple"
     [paginator]="true"
     [rows]="10"
@@ -56,4 +67,5 @@
       </tr>
     </ng-template>
   </p-table>
+  }
 </section>

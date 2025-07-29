@@ -12,6 +12,8 @@ import { PrimeTemplate } from 'primeng/api';
 
 /* Your form component */
 import { AddMovieComponent } from '../add-movie/add-movie.component';
+import {resourceObsNoParams} from '../../utils';
+import {ProgressSpinner} from 'primeng/progressspinner';
 
 @Component({
   selector: 'app-movie-list',
@@ -26,34 +28,38 @@ import { AddMovieComponent } from '../add-movie/add-movie.component';
     ButtonDirective,
     ButtonLabel,
     ButtonIcon,
+    ProgressSpinner,
   ],
   templateUrl: './movie-list.component.html',
   styleUrl: './movie-list.component.css',
 })
-export class MovieListComponent implements OnInit {
+export class MovieListComponent {
   private readonly client = inject(MovieReviewerClient);
   private readonly router = inject(Router);
 
-  protected readonly movies = signal<MovieSummaryDto[]>([]);
+  protected readonly movies = resourceObsNoParams(() => this.client.moviesGet());
   protected readonly showAdd = signal(false);
 
-  ngOnInit() {
-    this.reload();
-  }
-  reload() {
-    this.client.moviesGet().subscribe(dtos => this.movies.set(dtos));
-  }
   goTo(id: string) {
-    this.router.navigate(['/movies', id]);
+    this.router.navigate(['reviewer/movies', id]);
   }
+
   openAdd() {
     this.showAdd.set(true);
   }
   closedAdd() {
-    this.reload();
+    this.movies.reload();
   }
+
   onMovieCreated() {
     this.showAdd.set(false);
-    this.reload();
+    this.movies.reload();
+  }
+
+  generateMovies() {
+    this.client.generateMovies(10).subscribe(r => {
+      this.movies.reload();
+      this.showAdd.set(false);
+    });
   }
 }

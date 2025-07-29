@@ -8,16 +8,17 @@
     <div class="flex gap-3">
       <button
         pButton
+        text
         type="button"
         class="p-button-sm"
-        (click)="reload()"
+        (click)="movies.reload()"
       >
         <i class="pi pi-refresh" pButtonIcon></i>
-        <span pButtonLabel>Refresh</span>
       </button>
 
       <button
         pButton
+        text
         type="button"
         class="p-button-sm p-button-success"
         (click)="openAdd()"
@@ -25,13 +26,30 @@
         <i class="pi pi-plus" pButtonIcon></i>
         <span pButtonLabel>Add Movie</span>
       </button>
+
+      <button
+        pButton
+        text
+        type="button"
+        class="p-button-sm p-button-success"
+        (click)="generateMovies()"
+      >
+        <i class="pi pi-plus" pButtonIcon></i>
+        <span pButtonLabel>Generate Movies</span>
+      </button>
     </div>
   </header>
 
-
+  @if (movies.isLoading()) {
+    <div class="flex justify-center">
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+  } @else if (!movies.hasValue()) {
+    <p class="text-center text-gray-500">No movies found.</p>
+  } @else {
   <!-- PrimeNG DataView in grid layout -->
-  <p-dataView
-    [value]="movies()"
+    <p-dataView
+    [value]="movies.value()"
     layout="grid"
     [paginator]="true"
     [rows]="12"
@@ -54,7 +72,7 @@
               </ng-template>
 
               <p class="mt-2 text-sm opacity-80 line-clamp-4">
-                {{ movie.plot }}
+                {{ movie.plotShortened }}
               </p>
 
               <div class="mt-4 flex flex-wrap gap-2">
@@ -80,7 +98,7 @@
       </div>
     </ng-template>
   </p-dataView>
-
+  }
   <p-dialog
     [(visible)]="showAdd"
     header="Add New Movie"
