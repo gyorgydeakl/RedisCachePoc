@@ -1,0 +1,25 @@
+@if (data.isLoading()) {
+  <div class="flex justify-center">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+} @else if (!data.hasValue()) {
+  <p class="text-center text-gray-500">Failed to load cache</p>
+} @else if (isDataEmpty()) {
+  <p class="text-center text-gray-500">The cache is empty</p>
+} @else {
+  <div class="flex items-center justify-between p-mt-4">
+    <h2 class="text-xl font-semibold">Cache Contents</h2>
+    <button
+      pButton
+      type="button"
+      class="p-button-sm p-button-text"
+      (click)="clearCache()"
+    >
+      <i class="pi pi-refresh" pButtonIcon></i>
+      <span pButtonLabel>Clear Cache</span>
+    </button>
+  </div>
+  <p-scrollPanel class="p-mt-4">
+    <ngx-json-viewer [json]="data.value()" [expanded]="false"></ngx-json-viewer>
+  </p-scrollPanel>
+}

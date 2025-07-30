@@ -9,6 +9,7 @@ encoder.ts
 git_push.sh
 index.ts
 model/models.ts
+model/movieDetailsDto.ts
 model/userDto.ts
 model/watchlistItemDto.ts
 param.ts

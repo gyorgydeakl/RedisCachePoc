@@ -16,12 +16,9 @@ public class Program
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
-        builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
-        {
-            var options = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("RedisCache")!);
-            options.AllowAdmin = true;
-            return ConnectionMultiplexer.Connect(options);
-        });
+
+        var useAutoCache = builder.Services.AddCache(builder.Configuration);
+
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
         builder.Services.AddCors(options =>
@@ -49,7 +46,14 @@ public class Program
         app.UseAuthorization();
         
         // --- Minimal‑API endpoints -----------------------------------------
-        app.MapMoviePlannerEndpoints();
+        if (useAutoCache)
+        {
+            app.MapAppEndpointsWithAutoCache();
+        }
+        else
+        {
+            app.MapAppEndpoints();
+        }
         app.Run();
     }
 }

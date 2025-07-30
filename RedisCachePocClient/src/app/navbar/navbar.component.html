@@ -8,16 +8,12 @@
 
   <!-- Action buttons -->
   <div class="flex gap-3">
-    <!-- clear cache -->
-    <button pButton (click)="clearCache()" class="p-button-sm p-button-text">
-      <i class="pi pi-refresh" pButtonIcon></i>
-      <span pButtonLabel>Clear Cache</span>
-    </button>
-    <!-- add random data -->
-    <button pButton (click)="addRandomData()" class="p-button-sm p-button-text">
-      <i class="pi pi-plus" pButtonIcon></i>
-      <span pButtonLabel>Add Random Data</span>
-    </button>
+    <!-- view cache -->
+    <button pButton (click)="viewCache()" class="p-button-sm p-button-text">
+      <i class="pi pi-eye" pButtonIcon></i>
+      <span pButtonLabel>View Cache</span>
+    </button>    <!-- clear cache -->
+
     <!-- clear the db -->
     <button pButton (click)="clearDb()" class="p-button-sm p-button-text">
       <i class="pi pi-trash" pButtonIcon></i>

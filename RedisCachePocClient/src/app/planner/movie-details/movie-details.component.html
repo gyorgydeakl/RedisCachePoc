@@ -28,13 +28,37 @@
     </div>
 
     <!-- ░░░  PLOT  ░░░ -->
-    <p-card class="mb-8 rounded-full shadow-md">
-      <ng-template pTemplate="header">
-        <h2 class="text-2xl font-medium pl-5 pt-5">Plot</h2>
-      </ng-template>
-      <p class="leading-relaxed text-gray-800 whitespace-pre-line">
-        {{ m.plot }}
-      </p>
-    </p-card>
+    <div class="mb-4">
+      <button
+        pButton
+        type="button"
+        class="p-button-text p-mb-2"
+        (click)="togglePlot()"
+      >
+        <i
+          class="pi"
+          [class.pi-chevron-down]="!plotExpanded()"
+          [class.pi-chevron-up]="plotExpanded()"
+          pButtonIcon
+        ></i>
+        <span pButtonLabel>
+          {{ plotExpanded() ? 'Hide Plot' : 'Show Plot' }}
+        </span>
+      </button>
+
+      <p-card class="rounded-lg shadow-md">
+        <ng-template pTemplate="header">
+          <h2 class="text-2xl font-medium pl-5 pt-5">Plot</h2>
+        </ng-template>
+
+        <div class="p-5 text-gray-800 whitespace-pre-line">
+          @if (plotExpanded()) {
+            {{ m.plot }}
+          } @else {
+            {{ getPlotPreview(m.plot, 10) }} (...)
+          }
+        </div>
+      </p-card>
+    </div>
   }
 </section>

@@ -8,7 +8,6 @@ configuration.ts
 encoder.ts
 git_push.sh
 index.ts
-model/anonymousTypeOfintAndintAndint.ts
 model/createMovieDto.ts
 model/createReviewDto.ts
 model/createUserDto.ts
@@ -16,7 +15,6 @@ model/models.ts
 model/movieDetailsDto.ts
 model/movieSummaryDto.ts
 model/reviewDto.ts
-model/seedDto.ts
 model/userDto.ts
 param.ts
 provide-api.ts

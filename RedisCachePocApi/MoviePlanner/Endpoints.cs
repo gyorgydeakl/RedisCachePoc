@@ -8,7 +8,7 @@ namespace MoviePlanner;
 
 public static class Endpoints
 {
-    public static void MapMoviePlannerEndpoints(this WebApplication app)
+    public static void MapAppEndpoints(this WebApplication app)
     {
         app.MapGet("watchlist/{userId:guid}", async (Guid userId, AppDbContext db, IConnectionMultiplexer redis) =>
         {
@@ -70,7 +70,8 @@ public static class Endpoints
 
             return TypedResults.Ok(movieDetails);
         })
-        .WithOpenApi();
+        .WithOpenApi()
+        .WithName("GetMovie");
 
         app.MapGet("users", async (AppDbContext db, IConnectionMultiplexer redis) =>
         {
@@ -128,7 +129,7 @@ public static class Endpoints
 
             if (candidates.Count == 0)
             {
-                return Results.BadRequest("No more movies available to add to this watch‑list.");
+                return Results.BadRequest("No movies available to add to this watch‑list.");
             }
 
             // 3️⃣  Randomly pick up to <count> distinct movies
@@ -161,37 +162,37 @@ public static class Endpoints
         .WithName("GenerateWatchList");
 
         app.MapGet("user/{userId:guid}", async (Guid userId, AppDbContext db, IConnectionMultiplexer redis) =>
+        {
+            var key = $"user:{userId:N}";
+
+            var cache = redis.GetDatabase();
+            string? cachedJson = await cache.StringGetAsync(key);
+
+            if (!string.IsNullOrEmpty(cachedJson))
             {
-                var key = $"user:{userId:N}";
+                var dto = JsonSerializer.Deserialize<UserDto>(cachedJson)!;
+                return TypedResults.Ok(dto);
+            }
 
-                var cache = redis.GetDatabase();
-                string? cachedJson = await cache.StringGetAsync(key);
+            var user = await db.Users
+                .Where(u => u.Id == userId)
+                .SingleOrDefaultAsync();
 
-                if (!string.IsNullOrEmpty(cachedJson))
-                {
-                    var dto = JsonSerializer.Deserialize<UserDto>(cachedJson)!;
-                    return TypedResults.Ok(dto);
-                }
+            if (user is null)
+            {
+                return Results.NotFound();
+            }
 
-                var user = await db.Users
-                    .Where(u => u.Id == userId)
-                    .SingleOrDefaultAsync();
+            var dtoFromDb = user.ToDto();
 
-                if (user is null)
-                {
-                    return Results.NotFound();
-                }
+            await cache.StringSetAsync(
+                key,
+                JsonSerializer.Serialize(dtoFromDb),
+                expiry: TimeSpan.FromMinutes(15),
+                flags: CommandFlags.FireAndForget);
 
-                var dtoFromDb = user.ToDto();
-
-                await cache.StringSetAsync(
-                    key,
-                    JsonSerializer.Serialize(dtoFromDb),
-                    expiry: TimeSpan.FromMinutes(15),
-                    flags: CommandFlags.FireAndForget);
-
-                return TypedResults.Ok(dtoFromDb);
-            })
+            return TypedResults.Ok(dtoFromDb);
+        })
         .WithOpenApi()
         .WithName("GetUser");
     }

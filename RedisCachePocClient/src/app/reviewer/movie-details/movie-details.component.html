@@ -30,17 +30,38 @@
     </div>
 
     <!-- ░░░  PLOT  ░░░ -->
-    <p-card class="mb-8 rounded-full shadow-md">
-      <ng-template pTemplate="header">
-        <h2 class="text-2xl font-medium pl-5 pt-5">Plot</h2>
-      </ng-template>
-      <p-scroll-panel class="max-h-100">
-        <p class="leading-relaxed text-gray-800 whitespace-pre-line">
-          {{ m.plot }}
-        </p>
-      </p-scroll-panel>
+    <div class="mb-4">
+      <button
+        pButton
+        type="button"
+        class="p-button-text p-mb-2"
+        (click)="togglePlot()"
+      >
+        <i
+          class="pi"
+          [class.pi-chevron-down]="!plotExpanded()"
+          [class.pi-chevron-up]="plotExpanded()"
+          pButtonIcon
+        ></i>
+        <span pButtonLabel>
+          {{ plotExpanded() ? 'Hide Plot' : 'Show Plot' }}
+        </span>
+      </button>
 
-    </p-card>
+      <p-card class="rounded-lg shadow-md">
+        <ng-template pTemplate="header">
+          <h2 class="text-2xl font-medium pl-5 pt-5">Plot</h2>
+        </ng-template>
+
+        <div class="p-5 text-gray-800 whitespace-pre-line">
+          @if (plotExpanded()) {
+            {{ m.plot }}
+          } @else {
+            {{ getPlotPreview(m.plot, 10) }} (...)
+          }
+        </div>
+      </p-card>
+    </div>
 
     <!-- ░░░  REVIEWS  ░░░ -->
     <p-card class="rounded-full shadow-md p-5">
@@ -74,31 +95,29 @@
       </ng-template>
 
       @if (m.reviews?.length) {
-        <p-scroll-panel class="max-h-100">
-          <div class="space-y-6">
-            @for (rev of m.reviews; track rev.id) {
-              <article class="border-l-4 border-primary-500 pl-4 space-y-1">
-                <div class="flex items-center gap-3">
-                  <a
-                    [routerLink]="['/planner/users', rev.userId]"
-                    class="font-semibold text-lg hover:underline focus:outline-none"
-                  >
-                    {{ rev.userName }}
-                  </a>
-                  <p-rating
-                    [ngModel]="rev.rating"
-                    [readonly]="true"
-                    pStyleClass="text-base align-middle"
-                  ></p-rating>
-                </div>
+        <div class="space-y-6">
+          @for (rev of m.reviews; track rev.id) {
+            <article class="border-l-4 border-primary-500 pl-4 space-y-1">
+              <div class="flex items-center gap-3">
+                <a
+                  [routerLink]="['/planner/users', rev.userId]"
+                  class="font-semibold text-lg hover:underline focus:outline-none"
+                >
+                  {{ rev.userName }}
+                </a>
+                <p-rating
+                  [ngModel]="rev.rating"
+                  [readonly]="true"
+                  pStyleClass="text-base align-middle"
+                ></p-rating>
+              </div>
 
-                <h4 class="text-base font-medium">{{ rev.title }}</h4>
-                <p class="opacity-80 whitespace-pre-line">{{ rev.description }}</p>
-                <small class="text-sm text-gray-500">{{ rev.date | date:'mediumDate' }}</small>
-              </article>
-            }
-          </div>
-        </p-scroll-panel>
+              <h4 class="text-base font-medium">{{ rev.title }}</h4>
+              <p class="opacity-80 whitespace-pre-line">{{ rev.description }}</p>
+              <small class="text-sm text-gray-500">{{ rev.date | date:'mediumDate' }}</small>
+            </article>
+          }
+        </div>
 
       } @else {
         <p class="italic text-gray-500">No reviews yet.</p>

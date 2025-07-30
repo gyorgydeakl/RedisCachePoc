@@ -161,76 +161,6 @@ public static class Endpoints
         })
         .WithOpenApi();
 
-        app.MapDelete("cache/clear", async (IConnectionMultiplexer mux) =>
-        {
-            const int dbNumber = 0;                         
-
-            foreach (var endpoint in mux.GetEndPoints())
-            {
-                await mux.GetServer(endpoint).FlushDatabaseAsync(dbNumber);
-            }
-
-            return TypedResults.NoContent(); 
-        })
-        .WithOpenApi();
-        app.MapPost("/generate", async ([FromBody] SeedDto seed, AppDbContext db) =>
-        {
-            // --- Faker setups -------------------------------------------------
-            var movieFaker = new Faker<Movie>()
-                .RuleFor(m => m.Title, f => f.Lorem.Sentence(3, 2))
-                .RuleFor(m => m.Genre, f => f.PickRandom("Action", "Drama", "Comedy", "Sci‑Fi", "Thriller", "Fantasy"))
-                .RuleFor(m => m.Director, f => f.Name.FullName())
-                .RuleFor(m => m.Plot, f => f.Lorem.Paragraphs(100, 300));
-
-            var userFaker = new Faker<User>()
-                .RuleFor(u => u.Email, f => f.Internet.Email())
-                .RuleFor(u => u.Username, f => f.Internet.UserName())
-                .RuleFor(u => u.Bio, f => f.Lorem.Paragraphs(1, 3));
-
-            // Generate movies & users
-            var movieList = movieFaker.Generate(seed.MovieCount);
-            var userList  = userFaker.Generate(seed.UserCount);
-
-            // Attach to DbContext so we can reference them when we build reviews
-            db.Movies.AddRange(movieList);
-            db.Users.AddRange(userList);
-            await db.SaveChangesAsync();               // so they get primary keys
-
-            // --- Build reviews -----------------------------------------------
-            var rand = new Random();
-            var reviewFaker = new Faker<Review>()
-                .RuleFor(r => r.Title,       f => f.Lorem.Sentence(4))
-                .RuleFor(r => r.Description, f => f.Lorem.Paragraph())
-                .RuleFor(r => r.Rating,      f => f.Random.Int(1, 5))
-                .RuleFor(r => r.Date,        f => f.Date.Recent(60, DateTime.UtcNow));
-
-            var reviewList = new List<Review>(seed.ReviewCount);
-
-            for (var i = 0; i < seed.ReviewCount; i++)
-            {
-                var review          = reviewFaker.Generate();
-                var randomMovie     = movieList[rand.Next(movieList.Count)];
-                var randomUser      = userList[rand.Next(userList.Count)];
-
-                review.MovieId = randomMovie.Id;
-                review.UserId  = randomUser.Id;
-
-                reviewList.Add(review);
-            }
-
-            db.Reviews.AddRange(reviewList);
-            await db.SaveChangesAsync();
-
-            return TypedResults.Ok(new
-            {
-                MoviesInserted  = movieList.Count,
-                UsersInserted   = userList.Count,
-                ReviewsInserted = reviewList.Count
-            });
-        })
-        .WithOpenApi()
-        .WithName("AddRandomData");
-
         app.MapPost("movies/generate", async ([FromQuery] int count, AppDbContext db, IConnectionMultiplexer redis) =>
             {
                 if (count <= 0)
@@ -244,7 +174,7 @@ public static class Endpoints
                     .RuleFor(m => m.Title, f => f.Lorem.Sentence(3, 2))
                     .RuleFor(m => m.Genre, f => f.PickRandom(genres))
                     .RuleFor(m => m.Director, f => f.Name.FullName())
-                    .RuleFor(m => m.Plot, f => f.Lorem.Paragraphs(100, 300));
+                    .RuleFor(m => m.Plot, f => f.Lorem.Paragraphs(1, 3));
 
                 var movies = movieFaker.Generate(count);
 
@@ -342,6 +272,7 @@ public static class Endpoints
         .WithName("GenerateReviewsForMovie");
         app.MapDelete("/db/clear", async (AppDbContext db) =>
         {
+            db.WatchlistItems.RemoveRange(db.WatchlistItems);
             db.Reviews.RemoveRange(db.Reviews);
             await db.SaveChangesAsync();
 
@@ -353,6 +284,43 @@ public static class Endpoints
         })
         .WithOpenApi()
         .WithName("ClearDatabase");
+
+        app.MapDelete("cache/clear", async (IConnectionMultiplexer mux) =>
+            {
+                const int dbNumber = 0;
+
+                foreach (var endpoint in mux.GetEndPoints())
+                {
+                    await mux.GetServer(endpoint).FlushDatabaseAsync(dbNumber);
+                }
+
+                return TypedResults.NoContent();
+            })
+            .WithOpenApi()
+            .WithName("ClearCache");
+
+        app.MapGet("cache", async (IConnectionMultiplexer redis) =>
+        {
+            var endpoint = redis.GetEndPoints().First();
+            var server   = redis.GetServer(endpoint);
+            var db       = redis.GetDatabase();
+
+            // 2) Iterate all keys in the selected Redis database
+            var allEntries = new Dictionary<string, string?>();
+            await foreach (var key in server.KeysAsync(database: db.Database, pattern: "*"))
+            {
+                // 3) For each key, read back the string value (or null)
+                var value = await db.StringGetAsync(key);
+                allEntries[key!] = value.HasValue
+                    ? value.ToString()
+                    : null;
+            }
+
+            // 4) Return as JSON
+            return Results.Ok(allEntries);
+        })
+        .WithOpenApi()
+        .WithName("GetFullCache");
     }
     
 }

@@ -31,13 +31,22 @@ export class WatchlistComponent {
     resourceObs(() => this.userId(), param => this.client.getWatchList(param))
 
   generateWatchlist() {
-    this.client.generateWatchList(this.userId(), 10).subscribe(_ => {
-      this.items.reload();
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Watchlist generated',
-        detail: `Generated watchlist!`
-      });
+    this.client.generateWatchList(this.userId(), 10).subscribe({
+      next: _ => {
+        this.items.reload();
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Watchlist generated',
+          detail: `Generated watchlist!`
+        });
+      },
+      error: err => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error generating watchlist',
+          detail: err.error
+        });
+      }
     });
   }
 

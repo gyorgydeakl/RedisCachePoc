@@ -6,6 +6,7 @@ import {ButtonDirective, ButtonIcon, ButtonLabel} from 'primeng/button';
 import {Card} from 'primeng/card';
 import {Tag} from 'primeng/tag';
 import {RouterLink} from '@angular/router';
+import {NgClass} from '@angular/common';
 
 @Component({
   selector: 'app-movie-details',
@@ -16,13 +17,14 @@ import {RouterLink} from '@angular/router';
     Card,
     PrimeTemplate,
     Tag,
-    RouterLink
+    RouterLink,
   ],
   templateUrl: './movie-details.component.html',
   styleUrl: './movie-details.component.css'
 })
 export class MovieDetailsComponent implements OnInit {
   private readonly client = inject(MoviePlannerClient);
+  readonly plotExpanded = signal(false);
 
   readonly movieId = input.required<string>()
   protected readonly movie = signal<MovieDetailsDto | null>(null);
@@ -31,6 +33,17 @@ export class MovieDetailsComponent implements OnInit {
     this.reload();
   }
   reload() {
-    this.client.moviesIdGet(this.movieId()).subscribe(movie => this.movie.set(movie));
+    this.client.getMovie(this.movieId()).subscribe(movie => this.movie.set(movie));
+  }
+
+
+  togglePlot() {
+    this.plotExpanded.set(!this.plotExpanded());
+  }
+
+  getPlotPreview(fullPlot: string, sentenceCount = 2): string {
+    const sentences = fullPlot.match(/[^\.!\?]+[\.!\?]+/g) || [fullPlot];
+    const preview = sentences.slice(0, sentenceCount).join(' ').trim();
+    return preview.endsWith('.') ? preview : preview + '…';
   }
 }
