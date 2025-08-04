@@ -70,6 +70,12 @@ public class Program
                     return Results.NotFound($"movie {input.MovieId} not found.");
                 }
 
+                var watchlistItemExists = await db.WatchlistItems.AnyAsync(w => w.UserId == input.UserId && w.MovieId == input.MovieId);
+                if (watchlistItemExists)
+                {
+                    return Results.Conflict($"This user already has that movie on the watchlist");
+                }
+
                 var item = input.ToWatchlistItem();
                 db.WatchlistItems.Add(item);
                 await db.SaveChangesAsync();

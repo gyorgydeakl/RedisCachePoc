@@ -32,7 +32,7 @@ import {MessageService} from 'primeng/api';
       <!-- Normal view ----------------------------------------------- -->
       <div class="flex flex-col gap-6 flex-1">
         <h2 class="text-lg font-semibold">
-          {{ user.value()?.username }} – choose a movie
+          {{ user.value().username }} – choose a movie
         </h2>
 
         <!-- Movie selector -->
@@ -50,6 +50,7 @@ import {MessageService} from 'primeng/api';
         <p-button
           label="Add"
           class="w-full"
+          icon="pi pi-save"
           [loading]="isSubmitting()"
           [disabled]="!canSubmit()"
           (onClick)="addToWatchlist()"
@@ -83,30 +84,28 @@ export class AddWatchlistItemComponent {
     if (!this.canSubmit()) return;
 
     this.isSubmitting.set(true);
-    try {
-      this.planner.addWatchListItem({
-        userId:this.userId(),
-        movieId: this.selectedMovieId()!
-      }).subscribe({
-        next: _ => {
-          this.user.reload();
-          this.userAdded.emit();
-          this.msg.add({
-            severity: 'success',
-            summary: 'Movie added to watchlist',
-            detail: `Movie '${this.selectedMovieId()}' added to watchlist!`
-          })
-        },
-        error: err => {
-          this.msg.add({
-            severity: 'error',
-            summary: 'Error adding movie to watchlist',
-            detail: err.error
-          })
-        }
-      });
-    } finally {
-      this.isSubmitting.set(false);
-    }
+    console.log("submitting");
+    this.planner.addWatchListItem({
+      userId:this.userId(),
+      movieId: this.selectedMovieId()!
+    }).subscribe({
+      next: _ => {
+        this.user.reload();
+        this.userAdded.emit();
+        this.isSubmitting.set(false);
+        this.msg.add({
+          severity: 'success',
+          summary: 'Movie added to watchlist',
+          detail: `Movie '${this.selectedMovieId()}' added to watchlist!`
+        })
+      },
+      error: err => {
+        this.msg.add({
+          severity: 'error',
+          summary: 'Error adding movie to watchlist',
+          detail: err.error
+        })
+      }
+    });
   };
 }

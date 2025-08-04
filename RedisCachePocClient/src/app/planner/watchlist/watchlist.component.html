@@ -78,6 +78,7 @@
   class="h-full"
   modal
   [visible]="dialogVisible()"
+  (visibleChange)="dialogVisible.set($event)"
   (onHide)="dialogVisible.set(false)"
   [style]="{ width: '32rem', height: '40rem' }"
   [contentStyle]="{
