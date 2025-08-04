@@ -1,4 +1,4 @@
-import {Component, computed, inject} from '@angular/core';
+import {Component, computed, effect, inject} from '@angular/core';
 import {MovieReviewerClient} from '../../reviewer-client';
 import {resourceObs, resourceObsNoParams} from '../utils';
 import {ProgressSpinner} from 'primeng/progressspinner';
@@ -25,11 +25,13 @@ import {DynamicDialogConfig} from 'primeng/dynamicdialog';
 export class ViewCacheComponent {
   private readonly client = inject(MovieReviewerClient);
   private readonly messageService = inject(MessageService);
-  public readonly config = inject(DynamicDialogConfig);
 
   readonly data = resourceObsNoParams(() => this.client.getFullCache())
   readonly isDataEmpty = computed<boolean>(() => Object.keys(this.data.value()).length === 0);
 
+  constructor() {
+    effect(() => console.log(this.data.value()));
+  }
   clearCache() {
     this.client.clearCache().subscribe(
       _ => {

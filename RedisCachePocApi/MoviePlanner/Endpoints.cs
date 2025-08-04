@@ -90,11 +90,10 @@ public static class Endpoints
                 .Select(u => u.ToDto())
                 .ToListAsync();
 
-            var ttl = TimeSpan.FromMinutes(10);
             await cache.StringSetAsync(
-                key,
-                JsonSerializer.Serialize(dtoListFromDb),
-                ttl,
+                key: key,
+                value: JsonSerializer.Serialize(dtoListFromDb),
+                expiry: TimeSpan.FromMinutes(10),
                 flags: CommandFlags.FireAndForget);
 
             return TypedResults.Ok(dtoListFromDb);
@@ -102,27 +101,25 @@ public static class Endpoints
         .WithOpenApi()
         .WithName("GetUsers");
 
-        app.MapPost("/watchlist/{id:guid}/generate", async (Guid id, [FromQuery] int count, AppDbContext db) =>
+        app.MapPost("/watchlist/{userId:guid}/generate", async (Guid userId, [FromQuery] int count, AppDbContext db) =>
         {
             if (count <= 0)
             {
                 return Results.BadRequest("Parameter 'count' must be a positive number.");
             }
 
-            // 1️⃣  Get the user and current watch‑list
             var user = await db.Users
                 .Include(u => u.WatchList)
-                .Where(u => u.Id == id)
+                .Where(u => u.Id == userId)
                 .SingleOrDefaultAsync();
 
             if (user is null)
             {
-                return Results.NotFound($"User {id} not found.");
+                return Results.NotFound($"User {userId} not found.");
             }
 
             var existingMovieIds = user.WatchList.Select(w => w.Id).ToHashSet();
 
-            // 2️⃣  Find movies not yet on the list
             var candidates = await db.Movies
                 .Where(m => !existingMovieIds.Contains(m.Id))
                 .ToListAsync();
@@ -132,7 +129,6 @@ public static class Endpoints
                 return Results.BadRequest("No movies available to add to this watch‑list.");
             }
 
-            // 3️⃣  Randomly pick up to <count> distinct movies
             var rand      = new Random();
             var toInsert  = new List<WatchlistItem>();
             var take      = Math.Min(count, candidates.Count);
@@ -144,7 +140,7 @@ public static class Endpoints
 
                 toInsert.Add(new WatchlistItem
                 {
-                    UserId  = id,
+                    UserId  = userId,
                     MovieId = movie.Id
                 });
             }
@@ -154,7 +150,7 @@ public static class Endpoints
 
             return TypedResults.Ok(new
             {
-                UserId = id,
+                UserId = userId,
                 ItemsInserted = toInsert.Count
             });
         })

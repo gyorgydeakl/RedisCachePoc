@@ -8,6 +8,7 @@ configuration.ts
 encoder.ts
 git_push.sh
 index.ts
+model/createWatchlistItemDto.ts
 model/models.ts
 model/movieDetailsDto.ts
 model/userDto.ts

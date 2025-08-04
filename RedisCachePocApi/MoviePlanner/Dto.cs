@@ -2,6 +2,11 @@
 
 namespace MoviePlanner;
 
+public record CreateWatchlistItemDto
+{
+    public required Guid UserId { get; init; }
+    public required Guid MovieId { get; init; }
+}
 public record WatchlistItemDto
 {
     public required Guid Id { get; init; }
@@ -59,6 +64,15 @@ public static class DtoExtensions
             Director = movie.Director,
             Plot = movie.Plot,
             ReviewCount = reviewCount
+        };
+    }
+
+    public static WatchlistItem ToWatchlistItem(this CreateWatchlistItemDto dto)
+    {
+        return new WatchlistItem()
+        {
+            UserId = dto.UserId,
+            MovieId = dto.MovieId
         };
     }
 }

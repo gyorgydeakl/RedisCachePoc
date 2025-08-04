@@ -11,6 +11,11 @@
       </button>
       <button pButton text type="button" class="p-button-sm" (click)="generateWatchlist()">
         <i class="pi pi-plus" pButtonIcon></i>
+        <span pButtonLabel>Generate</span>
+      </button>
+      <button pButton text type="button" class="p-button-sm" (click)="openAdd()">
+        <i class="pi pi-plus" pButtonIcon></i>
+        <span pButtonLabel>Add</span>
       </button>
     </div>
   </header>
@@ -66,3 +71,21 @@
 
   }
 </section>
+
+<p-dialog
+  #addDialog
+  header="Add movie to watch-list"
+  class="h-full"
+  modal
+  [visible]="dialogVisible()"
+  (onHide)="dialogVisible.set(false)"
+  [style]="{ width: '32rem', height: '40rem' }"
+  [contentStyle]="{
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100%'
+  }"
+>
+  <app-add-watchlist [userId]="userId()" (userAdded)="dialogVisible.set(false)"></app-add-watchlist>
+
+</p-dialog>

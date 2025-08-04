@@ -1,4 +1,4 @@
-import {Component, inject, input} from '@angular/core';
+import {Component, inject, input, signal, viewChild} from '@angular/core';
 import { Router } from '@angular/router';
 import { MoviePlannerClient } from '../../../planner-client';
 import {TableModule} from 'primeng/table';
@@ -6,6 +6,9 @@ import {ButtonDirective, ButtonIcon, ButtonLabel} from 'primeng/button';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {resourceObs} from '../../utils';
 import {MessageService} from 'primeng/api';
+import {DialogService} from 'primeng/dynamicdialog';
+import {AddWatchlistItemComponent} from '../add-watchlist-item/add-watchlist-item.component';
+import {Dialog} from 'primeng/dialog';
 
 @Component({
   selector: 'app-watchlist',
@@ -15,7 +18,9 @@ import {MessageService} from 'primeng/api';
     ButtonDirective,
     ButtonIcon,
     ButtonLabel,
-    ProgressSpinner
+    ProgressSpinner,
+    AddWatchlistItemComponent,
+    Dialog
 
   ],
   templateUrl: './watchlist.component.html',
@@ -25,10 +30,12 @@ export class WatchlistComponent {
   private readonly client  = inject(MoviePlannerClient);
   private readonly messageService  = inject(MessageService);
   private readonly router  = inject(Router);
+  private readonly addDialog = viewChild.required<Dialog>('addDialog');
 
   readonly userId = input.required<string>();
   readonly items =
     resourceObs(() => this.userId(), param => this.client.getWatchList(param))
+  readonly dialogVisible = signal(false);
 
   generateWatchlist() {
     this.client.generateWatchList(this.userId(), 10).subscribe({
@@ -52,5 +59,9 @@ export class WatchlistComponent {
 
   goTo(movieId: string) {
     this.router.navigate(['/planner/movies', movieId]);
+  }
+
+  openAdd() {
+    this.dialogVisible.set(true)
   }
 }

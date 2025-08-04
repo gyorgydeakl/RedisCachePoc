@@ -9,8 +9,7 @@ public static class CacheExtensions
         var useAutoCache = config.GetValue<bool>("UseAutoCache");
         if (useAutoCache)
         {
-
-            services.AddStackExchangeRedisCache(options =>
+            services.AddStackExchangeRedisOutputCache(options =>
             {
                 options.Configuration = config.GetConnectionString("RedisCache");
             });

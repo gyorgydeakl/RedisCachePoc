@@ -47,7 +47,7 @@ namespace MoviePlanner
 
                 return TypedResults.Ok(dtoListFromDb);
             })
-            .CacheOutput(policy => policy.Expire(TimeSpan.FromMinutes(10)))
+            .CacheOutput()
             .WithOpenApi()
             .WithName("GetUsers");
 

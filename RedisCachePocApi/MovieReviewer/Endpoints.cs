@@ -174,7 +174,7 @@ public static class Endpoints
                     .RuleFor(m => m.Title, f => f.Lorem.Sentence(3, 2))
                     .RuleFor(m => m.Genre, f => f.PickRandom(genres))
                     .RuleFor(m => m.Director, f => f.Name.FullName())
-                    .RuleFor(m => m.Plot, f => f.Lorem.Paragraphs(1, 3));
+                    .RuleFor(m => m.Plot, f => f.Lorem.Paragraphs(100, 300));
 
                 var movies = movieFaker.Generate(count);
 

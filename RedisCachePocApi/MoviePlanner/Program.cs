@@ -1,7 +1,7 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RedisCachePocApi.Dal;
 using Scalar.AspNetCore;
-using StackExchange.Redis;
 
 namespace MoviePlanner;
 
@@ -44,7 +44,9 @@ public class Program
         app.UseHttpsRedirection();
         app.UseCors("AllowAngularDev");
         app.UseAuthorization();
-        
+
+        app.UseOutputCache();
+
         // --- Minimal‑API endpoints -----------------------------------------
         if (useAutoCache)
         {
@@ -54,6 +56,28 @@ public class Program
         {
             app.MapAppEndpoints();
         }
+        app.MapPost("/watchlist", async ([FromBody] CreateWatchlistItemDto input, AppDbContext db) =>
+            {
+                var userExists = await db.Users.AnyAsync(u => u.Id == input.UserId);
+                if (!userExists)
+                {
+                    return Results.NotFound($"User {input.UserId} not found.");
+                }
+
+                var movieExists = await db.Movies.AnyAsync(m => m.Id == input.MovieId);
+                if (!movieExists)
+                {
+                    return Results.NotFound($"movie {input.MovieId} not found.");
+                }
+
+                var item = input.ToWatchlistItem();
+                db.WatchlistItems.Add(item);
+                await db.SaveChangesAsync();
+
+                return TypedResults.Ok(item);
+            })
+            .WithOpenApi()
+            .WithName("AddWatchListItem");
         app.Run();
     }
 }
