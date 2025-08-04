@@ -1,0 +1,12 @@
+Előkészületek:
+- manuális cache endpointok használata
+- clear cache, clear db
+
+Demo:
+- generate movies, sokat!, cachelt movie és sima movie kérés közötti időkülönbség. 
+- Moviek resetelése
+- movie details ugyanez, egy movie megjegyzése
+- planner/reviewer alkalmazások felvezetése
+- user generálás, majd egy watchlistjéhez hozzáadni a megjegyzett moviet
+- movie lekérdezése plannerből, cahcelt eredmény megmutatása. majd törölni a cachet és úgy is
+- átállás automatikus cache-re plannerben, és megmutatni a bajt
